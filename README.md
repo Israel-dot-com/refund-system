@@ -233,9 +233,3 @@ The admin dashboard relies on filtering, sorting, joins, and concurrent writes. 
 **Temperature 0.1**  
 Very low temperature for consistent, policy-grounded decisions. We explicitly do not want creative AI outputs in a refund processing context.
 
-**What I'd add in production**  
-- Proper authentication (JWT / NextAuth) instead of a shared header key  
-- Email / webhook notifications for approved and escalated requests  
-- Redis for rate limiting (in-memory resets on restart)  
-- Background job queue (BullMQ) for async AI processing under load  
-- Comprehensive unit + integration tests  
