@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Customer {
+  id             String   @id @default(uuid())
+  name           String
+  email          String   @unique
+  accountAgeDays Int
+  tier           Tier     @default(STANDARD)
+  totalOrders    Int      @default(0)
+  fraudFlags     Int      @default(0)
+  createdAt      DateTime @default(now())
+
+  orders          Order[]
+  refundRequests  RefundRequest[]
+}
+
+model Order {
+  id            String        @id @default(uuid())
+  customerId    String
+  productName   String
+  productSku    String
+  amount        Float
+  status        OrderStatus   @default(DELIVERED)
+  isFinalSale   Boolean       @default(false)
+  orderDate     DateTime
+  deliveredDate DateTime?
+  itemCondition ItemCondition @default(GOOD)
+  createdAt     DateTime      @default(now())
+
+  customer       Customer       @relation(fields: [customerId], references: [id])
+  refundRequests RefundRequest[]
+}
+
+model RefundRequest {
+  id              String         @id @default(uuid())
+  customerId      String
+  orderId         String
+  message         String
+  decision        Decision       @default(PENDING)
+  aiReasoning     String?
+  aiConfidence    Float?
+  policyCitations String[]
+  policyFlags     String[]
+  amountRequested Float
+  overrideReason  String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  customer  Customer   @relation(fields: [customerId], references: [id])
+  order     Order      @relation(fields: [orderId], references: [id])
+  auditLogs AuditLog[]
+}
+
+model AuditLog {
+  id              String        @id @default(uuid())
+  refundRequestId String
+  eventType       String
+  payload         Json
+  createdAt       DateTime      @default(now())
+
+  refundRequest RefundRequest @relation(fields: [refundRequestId], references: [id])
+}
+
+enum Tier {
+  STANDARD
+  PREMIUM
+  VIP
+}
+
+enum OrderStatus {
+  PENDING
+  DELIVERED
+  CANCELLED
+}
+
+enum ItemCondition {
+  GOOD
+  DAMAGED
+  INCORRECT
+  CUSTOMER_DAMAGED
+}
+
+enum Decision {
+  PENDING
+  APPROVED
+  DENIED
+  ESCALATED
+}

@@ -1,0 +1,56 @@
+services:
+  # ─── PostgreSQL Database ───────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: refund_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: refund_user
+      POSTGRES_PASSWORD: refund_pass
+      POSTGRES_DB: refund_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U refund_user -d refund_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── Backend API ───────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./refund-system-be
+      dockerfile: Dockerfile
+    container_name: refund_backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://refund_user:refund_pass@postgres:5432/refund_db
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ADMIN_API_KEY: ${ADMIN_API_KEY:-admin-secret-key}
+      PORT: 4000
+      NODE_ENV: production
+      FRONTEND_URL: http://localhost:3000
+    ports:
+      - "4000:4000"
+
+  # ─── Frontend ─────────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./refund-system-fe
+      dockerfile: Dockerfile
+    container_name: refund_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:4000
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres_data:
