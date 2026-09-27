@@ -30,7 +30,7 @@ services:
         condition: service_healthy
     environment:
       DATABASE_URL: postgresql://refund_user:refund_pass@postgres:5432/refund_db
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY}
       ADMIN_API_KEY: ${ADMIN_API_KEY:-admin-secret-key}
       PORT: 4000
       NODE_ENV: production

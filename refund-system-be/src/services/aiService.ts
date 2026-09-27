@@ -3,7 +3,7 @@ import type { CustomerContext, OrderContext, AIDecisionResult, Decision } from '
 
 const client = new OpenAI({ 
   baseURL: 'https://api.deepseek.com',
-  apiKey: process.env.OPENAI_API_KEY || 'dummy_key_to_prevent_startup_crash' 
+  apiKey: process.env.DEEPSEEK_API_KEY || 'dummy_key_to_prevent_startup_crash' 
 });
 
 // ─── Refund Policy Document (source of truth for AI) ─────────────────────────
