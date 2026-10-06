@@ -2,6 +2,7 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  serverExternalPackages: ['prom-client'],
   // Allow cross-origin API calls to backend in development
   async rewrites() {
     return [
